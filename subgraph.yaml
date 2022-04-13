@@ -6,11 +6,11 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: Comptroller
-    network: mainnet
+    network: aurora
     source:
-      address: "0x3d9819210A31b4961b30EF54bE2aeD79B9c9Cd3B"
+      address: "0x6De54724e128274520606f038591A00C5E94a1F6"
       abi: Comptroller
-      startBlock: 7700000
+      startBlock: 60837800
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -50,7 +50,7 @@ dataSources:
 templates:
   - name: CToken
     kind: ethereum/contract
-    network: mainnet
+    network: aurora
     source:
       abi: CToken
     mapping:
