@@ -28,7 +28,7 @@ export function createAccountCToken(
   cTokenStats.symbol = symbol
   cTokenStats.market = marketID
   cTokenStats.account = account
-  cTokenStats.accrualBlockNumber = BigInt.fromI32(0)
+  cTokenStats.accrualBlockTimestamp = BigInt.fromI32(0)
   cTokenStats.cTokenBalance = zeroBD
   cTokenStats.totalUnderlyingSupplied = zeroBD
   cTokenStats.totalUnderlyingRedeemed = zeroBD
@@ -70,7 +70,7 @@ export function updateCommonCTokenStats(
     blockNumber,
     logIndex,
   )
-  cTokenStats.accrualBlockNumber = blockNumber
+  cTokenStats.accrualBlockTimestamp = blockNumber
   return cTokenStats as AccountCToken
 }
 

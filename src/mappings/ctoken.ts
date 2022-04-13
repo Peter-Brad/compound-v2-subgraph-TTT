@@ -340,11 +340,7 @@ export function handleTransfer(event: Transfer): void {
   // with normal transfers, since mint, redeem, and seize transfers will already run updateMarket()
   let marketID = event.address.toHexString()
   let market = Market.load(marketID)
-  if (market == null) {
-    market = createMarket(marketID)
-  }
-  market.save()
-  if (market.accrualBlockNumber != event.block.number.toI32()) {
+  if (market.accrualBlockTimestamp != event.block.timestamp.toI32()) {
     market = updateMarket(
       event.address,
       event.block.number.toI32(),
