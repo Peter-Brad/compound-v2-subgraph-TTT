@@ -78,6 +78,9 @@ export function handleMarketExited(event: MarketExited): void {
 
 export function handleNewCloseFactor(event: NewCloseFactor): void {
   let comptroller = Comptroller.load('1')
+  if (comptroller == null) {
+    comptroller = new Comptroller('1')
+  }
   comptroller.closeFactor = event.params.newCloseFactorMantissa
   comptroller.save()
 }

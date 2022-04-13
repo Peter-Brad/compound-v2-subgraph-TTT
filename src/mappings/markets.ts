@@ -18,8 +18,8 @@ import {
   zeroBD,
 } from './helpers'
 
-let cUSDCAddress = '0x39aa39c021dfbae8fac545936693ac917d5e7563'
-let cETHAddress = '0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5'
+let cUSDCAddress = '0xe5308dc623101508952948b141fD9eaBd3337D99'
+let cETHAddress = '0x4e8fe8fd314cfc09bdb0942c5adcc37431abdcd0'
 let daiAddress = '0x89d24a6b4ccb1b6faa2625fe562bdd9a23260359'
 
 // Used for all cERC20 contracts
@@ -49,6 +49,7 @@ function getTokenPrice(
    * and that they handle the decimals different, which can break the subgraph. So we actually
    * defer to Oracle 1 before block 7715908, which works,
    * until this one is deployed, which was used for 121 days */
+  /*
   if (blockNumber > 7715908) {
     let mantissaDecimalFactor = 18 - underlyingDecimals + 18
     let bdFactor = exponentToBigDecimal(mantissaDecimalFactor)
@@ -58,7 +59,7 @@ function getTokenPrice(
     underlyingPrice = tryPrice.reverted
       ? zeroBD
       : tryPrice.value.toBigDecimal().div(bdFactor)
-
+    */
     /* PriceOracle(1) is used (only for the first ~100 blocks of Comptroller. Annoying but we must
      * handle this. We use it for more than 100 blocks, see reason at top of if statement
      * of PriceOracle2.
@@ -67,13 +68,23 @@ function getTokenPrice(
      *
      * Note this returns the value already factoring in token decimals and wei, therefore
      * we only need to divide by the mantissa, 10^18 */
-  } else {
+  /*
+    } else {
     let oracle1 = PriceOracle.bind(priceOracle1Address)
     underlyingPrice = oracle1
       .getPrice(underlyingAddress)
       .toBigDecimal()
       .div(mantissaFactorBD)
   }
+  */
+  let mantissaDecimalFactor = 18 - underlyingDecimals + 18
+  let bdFactor = exponentToBigDecimal(mantissaDecimalFactor)
+  let oracle2 = PriceOracle2.bind(oracleAddress)
+  underlyingPrice = oracle2
+    .getUnderlyingPrice(eventAddress)
+    .toBigDecimal()
+    .div(bdFactor)
+
   return underlyingPrice
 }
 
@@ -81,12 +92,12 @@ function getTokenPrice(
 function getUSDCpriceETH(blockNumber: i32): BigDecimal {
   let comptroller = Comptroller.load('1')
   let oracleAddress = comptroller.priceOracle as Address
-  let priceOracle1Address = Address.fromString('02557a5e05defeffd4cae6d83ea3d173b272c904')
-  let USDCAddress = '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48 '
+  //let priceOracle1Address = Address.fromString('02557a5e05defeffd4cae6d83ea3d173b272c904')
+  //let USDCAddress = '0xe5308dc623101508952948b141fD9eaBd3337D99 '
   let usdPrice: BigDecimal
 
   // See notes on block number if statement in getTokenPrices()
-  if (blockNumber > 7715908) {
+  //if (blockNumber > 7715908) {
     let oracle2 = PriceOracle2.bind(oracleAddress)
     let mantissaDecimalFactorUSDC = 18 - 6 + 18
     let bdFactorUSDC = exponentToBigDecimal(mantissaDecimalFactorUSDC)
@@ -95,13 +106,15 @@ function getUSDCpriceETH(blockNumber: i32): BigDecimal {
     usdPrice = tryPrice.reverted
       ? zeroBD
       : tryPrice.value.toBigDecimal().div(bdFactorUSDC)
-  } else {
+  /*
+    } else {
     let oracle1 = PriceOracle.bind(priceOracle1Address)
     usdPrice = oracle1
       .getPrice(Address.fromString(USDCAddress))
       .toBigDecimal()
       .div(mantissaFactorBD)
   }
+  */
   return usdPrice
 }
 
@@ -196,7 +209,7 @@ export function updateMarket(
     let contract = CToken.bind(contractAddress)
 
     // After block 10678764 price is calculated based on USD instead of ETH
-    if (blockNumber > 10678764) {
+    //if (blockNumber > 10678764) {
       let ethPriceInUSD = getETHinUSD(blockNumber)
 
       // if cETH, we only update USD price
@@ -217,7 +230,9 @@ export function updateMarket(
           market.underlyingPriceUSD = tokenPriceUSD.truncate(market.underlyingDecimals)
         }
       }
-    } else {
+    //}
+    /*
+     else {
       let usdPriceInEth = getUSDCpriceETH(blockNumber)
 
       // if cETH, we only update USD price
@@ -241,6 +256,7 @@ export function updateMarket(
         }
       }
     }
+    */
 
     market.accrualBlockNumber = contract.accrualBlockNumber().toI32()
     market.blockTimestamp = blockTimestamp
