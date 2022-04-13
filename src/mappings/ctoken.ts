@@ -343,6 +343,7 @@ export function handleTransfer(event: Transfer): void {
   if (market == null) {
     market = createMarket(marketID)
   }
+  market.save()
   if (market.accrualBlockNumber != event.block.number.toI32()) {
     market = updateMarket(
       event.address,
