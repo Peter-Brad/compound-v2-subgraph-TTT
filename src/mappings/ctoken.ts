@@ -448,6 +448,9 @@ export function handleAccrueInterest(event: AccrueInterest): void {
 export function handleNewReserveFactor(event: NewReserveFactor): void {
   let marketID = event.address.toHex()
   let market = Market.load(marketID)
+  if (market == null) {
+    market = createMarket(marketID)
+  }
   market.reserveFactor = event.params.newReserveFactorMantissa
   market.save()
 }
